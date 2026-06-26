@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: cloudnest
+
+logging:
+  level:
+    root: INFO
