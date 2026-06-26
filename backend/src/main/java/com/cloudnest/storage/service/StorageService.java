@@ -9,7 +9,7 @@ public interface StorageService {
 
     StoredFile store(MultipartFile file) throws IOException;
 
-    byte[] read(String storedFilename) throws IOException;
+    org.springframework.core.io.Resource read(String storedFilename) throws IOException;
 
     void delete(String storedFilename) throws IOException;
 

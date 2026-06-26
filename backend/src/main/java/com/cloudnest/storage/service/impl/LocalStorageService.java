@@ -4,6 +4,8 @@ import com.cloudnest.storage.service.StorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.cloudnest.storage.model.StoredFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -34,10 +36,9 @@ public class LocalStorageService implements StorageService {
     }
 
     @Override
-    public byte[] read(String storedFilename) throws IOException {
-
-        return Files.readAllBytes(
-                ROOT.resolve(storedFilename));
+    public Resource read(String storedFilename) throws IOException {
+        Path path = ROOT.resolve(storedFilename);
+        return new UrlResource(path.toUri());
     }
 
     @Override

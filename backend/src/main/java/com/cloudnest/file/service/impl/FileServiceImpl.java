@@ -1,5 +1,6 @@
 package com.cloudnest.file.service.impl;
 
+import com.cloudnest.file.dto.response.DownloadFileResponse;
 import com.cloudnest.file.dto.response.FileResponse;
 import com.cloudnest.file.entity.FileMetadata;
 import com.cloudnest.file.mapper.FileMapper;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import java.util.UUID;
 
 import java.util.List;
 import java.io.IOException;
@@ -60,6 +63,29 @@ public class FileServiceImpl implements FileService {
                 .stream()
                 .map(fileMapper::toResponse)
                 .toList();
+    }
+
+    @Override
+    public DownloadFileResponse download(
+            UUID fileId,
+            Authentication authentication) throws IOException {
+
+        User owner = userRepository.findByEmail(authentication.getName())
+                .orElseThrow();
+
+        FileMetadata metadata = fileRepository.findById(fileId)
+                .orElseThrow();
+
+        if (!metadata.getOwner().getId().equals(owner.getId())) {
+            throw new RuntimeException("Access denied.");
+        }
+
+        Resource resource = storageService.read(metadata.getStoredFilename());
+
+        return new DownloadFileResponse(
+                resource,
+                metadata.getOriginalFilename(),
+                metadata.getContentType());
     }
 
 }
