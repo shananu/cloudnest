@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.io.IOException;
 
 @Service
@@ -28,8 +29,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileResponse upload(
             MultipartFile file,
-            Authentication authentication
-    ) throws IOException {
+            Authentication authentication) throws IOException {
 
         User owner = userRepository.findByEmail(authentication.getName())
                 .orElseThrow();
@@ -48,6 +48,18 @@ public class FileServiceImpl implements FileService {
         metadata = fileRepository.save(metadata);
 
         return fileMapper.toResponse(metadata);
+    }
+
+    @Override
+    public List<FileResponse> getMyFiles(Authentication authentication) {
+
+        User owner = userRepository.findByEmail(authentication.getName())
+                .orElseThrow();
+
+        return fileRepository.findByOwner(owner)
+                .stream()
+                .map(fileMapper::toResponse)
+                .toList();
     }
 
 }
