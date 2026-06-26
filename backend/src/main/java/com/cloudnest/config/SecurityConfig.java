@@ -16,12 +16,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/v1/auth/**",
                                 "/api/v1/health",
-                                "/actuator/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults());
+                                "/actuator/**")
+                        .permitAll()
+                        .anyRequest().authenticated());
 
         return http.build();
     }

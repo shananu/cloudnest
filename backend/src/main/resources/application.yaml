@@ -4,3 +4,8 @@ spring:
 
 server:
   port: 8080
+
+jwt:
+  secret: 4c6f75644e6573745365637265744b6579466f72537072696e67426f6f7432303236
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000

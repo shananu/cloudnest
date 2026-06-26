@@ -13,17 +13,17 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception ex){
+    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
 
         ErrorResponse response = ErrorResponse.builder()
                 .timestamp(Instant.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message("Something went wrong")
-                .errors(List.of(ex.getMessage()))
+                .status(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .errors(List.of())
                 .build();
 
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.CONFLICT)
                 .body(response);
 
     }

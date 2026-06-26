@@ -3,19 +3,20 @@ package com.cloudnest.user.entity;
 import com.cloudnest.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(
-        name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "email")
-        }
+    name = "users",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email")
+    }
 )
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class User extends BaseEntity {
 
     @Column(nullable = false)
@@ -28,6 +29,5 @@ public class User extends BaseEntity {
     private String email;
 
     @Column(nullable = false)
-    private String password;
-
+    private String passwordHash;
 }
