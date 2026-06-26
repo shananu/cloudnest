@@ -1,13 +1,11 @@
 package com.cloudnest.auth.jwt;
 
+import com.cloudnest.user.entity.User;
+
 public interface JwtService {
 
-    String generateAccessToken(String email);
-
-    String generateRefreshToken(String email);
-
+    String generateAccessToken(User user);
+    String generateRefreshToken(User user);
     String extractUsername(String token);
-
-    boolean isTokenValid(String token);
-
+    boolean isTokenValid(String token, User user);
 }
