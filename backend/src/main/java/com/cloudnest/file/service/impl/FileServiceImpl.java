@@ -1,5 +1,6 @@
 package com.cloudnest.file.service.impl;
 
+import com.cloudnest.file.dto.request.RenameFileRequest;
 import com.cloudnest.file.dto.response.DownloadFileResponse;
 import com.cloudnest.file.dto.response.FileResponse;
 import com.cloudnest.file.entity.FileMetadata;
@@ -73,12 +74,7 @@ public class FileServiceImpl implements FileService {
         User owner = userRepository.findByEmail(authentication.getName())
                 .orElseThrow();
 
-        FileMetadata metadata = fileRepository.findById(fileId)
-                .orElseThrow();
-
-        if (!metadata.getOwner().getId().equals(owner.getId())) {
-            throw new RuntimeException("Access denied.");
-        }
+        FileMetadata metadata = getOwnedFile(fileId, owner);
 
         Resource resource = storageService.read(metadata.getStoredFilename());
 
@@ -86,6 +82,49 @@ public class FileServiceImpl implements FileService {
                 resource,
                 metadata.getOriginalFilename(),
                 metadata.getContentType());
+    }
+
+    private FileMetadata getOwnedFile(UUID fileId, User owner) {
+
+        FileMetadata metadata = fileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        if (!metadata.getOwner().getId().equals(owner.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return metadata;
+    }
+
+    @Override
+    public void delete(
+            UUID fileId,
+            Authentication authentication) throws IOException {
+
+        User owner = userRepository.findByEmail(authentication.getName())
+                .orElseThrow();
+
+        FileMetadata metadata = getOwnedFile(fileId, owner);
+
+        storageService.delete(metadata.getStoredFilename());
+
+        fileRepository.delete(metadata);
+    }
+
+    @Override
+    public FileResponse rename(
+            UUID fileId,
+            RenameFileRequest request,
+            Authentication authentication) {
+
+        User owner = userRepository.findByEmail(authentication.getName())
+                .orElseThrow();
+
+        FileMetadata metadata = getOwnedFile(fileId, owner);
+        metadata.setOriginalFilename(request.getFilename());
+        metadata = fileRepository.save(metadata);
+
+        return fileMapper.toResponse(metadata);
     }
 
 }
