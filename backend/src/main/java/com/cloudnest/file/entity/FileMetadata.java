@@ -28,7 +28,7 @@ public class FileMetadata extends BaseEntity {
     private Long size;
 
     @Column(nullable = false)
-    private String storagePath;
+    private String storageKey;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)

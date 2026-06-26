@@ -7,6 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface FileMapper {
 
-    FileResponse toResponse(FileMetadata file);
+    FileResponse toResponse(FileMetadata metadata);
 
 }

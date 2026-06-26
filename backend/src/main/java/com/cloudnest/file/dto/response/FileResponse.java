@@ -5,8 +5,8 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-@Getter
 @Builder
+@Getter
 public class FileResponse {
 
     private UUID id;
@@ -16,4 +16,6 @@ public class FileResponse {
     private String contentType;
 
     private Long size;
+
+    private String storageKey;
 }
