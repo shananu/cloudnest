@@ -1,5 +1,7 @@
 package com.cloudnest.file.service.impl;
 
+import com.cloudnest.common.exception.AccessDeniedException;
+import com.cloudnest.common.exception.ResourceNotFoundException;
 import com.cloudnest.file.dto.request.RenameFileRequest;
 import com.cloudnest.file.dto.response.DownloadFileResponse;
 import com.cloudnest.file.dto.response.FileResponse;
@@ -36,7 +38,7 @@ public class FileServiceImpl implements FileService {
             Authentication authentication) throws IOException {
 
         User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("User"));
 
         StoredFile storedFile = storageService.store(file);
 
@@ -58,7 +60,7 @@ public class FileServiceImpl implements FileService {
     public List<FileResponse> getMyFiles(Authentication authentication) {
 
         User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("User"));
 
         return fileRepository.findByOwner(owner)
                 .stream()
@@ -72,7 +74,7 @@ public class FileServiceImpl implements FileService {
             Authentication authentication) throws IOException {
 
         User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("User"));
 
         FileMetadata metadata = getOwnedFile(fileId, owner);
 
@@ -87,10 +89,10 @@ public class FileServiceImpl implements FileService {
     private FileMetadata getOwnedFile(UUID fileId, User owner) {
 
         FileMetadata metadata = fileRepository.findById(fileId)
-                .orElseThrow(() -> new RuntimeException("File not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User"));
 
         if (!metadata.getOwner().getId().equals(owner.getId())) {
-            throw new RuntimeException("Access denied");
+           throw new AccessDeniedException();
         }
 
         return metadata;
@@ -102,7 +104,7 @@ public class FileServiceImpl implements FileService {
             Authentication authentication) throws IOException {
 
         User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow();
+               .orElseThrow(() -> new ResourceNotFoundException("User"));
 
         FileMetadata metadata = getOwnedFile(fileId, owner);
 
@@ -118,7 +120,7 @@ public class FileServiceImpl implements FileService {
             Authentication authentication) {
 
         User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("User"));
 
         FileMetadata metadata = getOwnedFile(fileId, owner);
         metadata.setOriginalFilename(request.getFilename());

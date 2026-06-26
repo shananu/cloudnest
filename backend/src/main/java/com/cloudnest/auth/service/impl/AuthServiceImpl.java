@@ -4,6 +4,7 @@ import com.cloudnest.auth.dto.request.LoginRequest;
 import com.cloudnest.auth.dto.request.RegisterRequest;
 import com.cloudnest.auth.dto.response.AuthResponse;
 import com.cloudnest.auth.service.AuthService;
+import com.cloudnest.common.exception.ResourceNotFoundException;
 import com.cloudnest.exception.EmailAlreadyExistsException;
 import com.cloudnest.user.entity.User;
 import com.cloudnest.user.mapper.UserMapper;
@@ -60,7 +61,7 @@ public AuthResponse login(LoginRequest request) {
     );
 
     User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("User"));
 
     String accessToken = jwtService.generateAccessToken(user);
 
