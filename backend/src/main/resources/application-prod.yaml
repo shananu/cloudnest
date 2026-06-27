@@ -2,6 +2,18 @@ spring:
   application:
     name: cloudnest
 
-logging:
-  level:
-    root: INFO
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cloudnest
+    username: postgres
+    password: Befeelg15!
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+minio:
+  endpoint: http://localhost:9000
+  access-key: admin
+  secret-key: password123
+  bucket: cloudnest

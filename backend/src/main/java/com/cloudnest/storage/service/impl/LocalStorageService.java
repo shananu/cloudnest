@@ -4,6 +4,8 @@ import com.cloudnest.storage.service.StorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.cloudnest.storage.model.StoredFile;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
@@ -12,6 +14,7 @@ import java.nio.file.*;
 import java.util.UUID;
 
 @Service
+@Profile("dev")
 public class LocalStorageService implements StorageService {
 
     private static final Path ROOT = Paths.get("storage/uploads");
