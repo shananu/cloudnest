@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
-import java.util.UUID;
 
+import java.util.UUID;
 import java.util.List;
 import java.io.IOException;
 
@@ -24,82 +24,111 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class FileController {
 
-    private final FileService fileService;
+        private final FileService fileService;
 
-    @PostMapping("/upload")
-    public ApiResponse<FileResponse> upload(
-            @RequestParam("file") MultipartFile file,
-            Authentication authentication) throws IOException {
+        @PostMapping("/upload")
+        public ApiResponse<FileResponse> upload(
 
-        return ApiResponse.<FileResponse>builder()
-                .success(true)
-                .message("File uploaded successfully")
-                .data(fileService.upload(file, authentication))
-                .build();
-    }
+                        @RequestParam("file") MultipartFile file,
 
-    @GetMapping
-    public ApiResponse<List<FileResponse>> getMyFiles(
-            Authentication authentication) {
+                        @RequestParam(required = false) UUID folderId,
 
-        return ApiResponse.<List<FileResponse>>builder()
-                .success(true)
-                .message("Files fetched successfully")
-                .data(fileService.getMyFiles(authentication))
-                .build();
-    }
+                        Authentication authentication
 
-    @GetMapping("/{id}/download")
-    public ResponseEntity<Resource> download(
-            @PathVariable UUID id,
-            Authentication authentication) throws IOException {
+        ) throws IOException {
 
-        DownloadFileResponse response = fileService.download(id, authentication);
+                return ApiResponse.<FileResponse>builder()
+                                .success(true)
+                                .message("File uploaded successfully")
+                                .data(
+                                                fileService.upload(
+                                                                file,
+                                                                folderId,
+                                                                authentication))
+                                .build();
+        }
 
-        return ResponseEntity.ok()
-                .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" +
-                                response.originalFilename() +
-                                "\"")
-                .contentType(
-                        MediaType.parseMediaType(
-                                response.contentType()))
-                .body(response.resource());
-    }
+        @GetMapping
+        public ApiResponse<List<FileResponse>> getMyFiles(
+                        Authentication authentication) {
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(
-            @PathVariable UUID id,
-            Authentication authentication) throws IOException {
+                return ApiResponse.<List<FileResponse>>builder()
+                                .success(true)
+                                .message("Files fetched successfully")
+                                .data(fileService.getMyFiles(authentication))
+                                .build();
+        }
 
-        fileService.delete(id, authentication);
+        @GetMapping("/{id}/download")
+        public ResponseEntity<Resource> download(
+                        @PathVariable UUID id,
+                        Authentication authentication) throws IOException {
 
-        return ApiResponse.<Void>builder()
-                .success(true)
-                .message("File deleted successfully")
-                .build();
-    }
+                DownloadFileResponse response = fileService.download(id, authentication);
 
-    @PatchMapping("/{id}")
-    public ApiResponse<FileResponse> rename(
+                return ResponseEntity.ok()
+                                .header(
+                                                HttpHeaders.CONTENT_DISPOSITION,
+                                                "attachment; filename=\"" +
+                                                                response.originalFilename() +
+                                                                "\"")
+                                .contentType(
+                                                MediaType.parseMediaType(
+                                                                response.contentType()))
+                                .body(response.resource());
+        }
 
-            @PathVariable UUID id,
+        @DeleteMapping("/{id}")
+        public ApiResponse<Void> delete(
+                        @PathVariable UUID id,
+                        Authentication authentication) throws IOException {
 
-            @Valid @RequestBody RenameFileRequest request,
+                fileService.delete(id, authentication);
 
-            Authentication authentication
+                return ApiResponse.<Void>builder()
+                                .success(true)
+                                .message("File deleted successfully")
+                                .build();
+        }
 
-    ) {
+        @PatchMapping("/{id}")
+        public ApiResponse<FileResponse> rename(
 
-        return ApiResponse.<FileResponse>builder()
-                .success(true)
-                .message("File renamed successfully")
-                .data(
-                        fileService.rename(
-                                id,
-                                request,
-                                authentication))
-                .build();
-    }
+                        @PathVariable UUID id,
+
+                        @Valid @RequestBody RenameFileRequest request,
+
+                        Authentication authentication
+
+        ) {
+
+                return ApiResponse.<FileResponse>builder()
+                                .success(true)
+                                .message("File renamed successfully")
+                                .data(
+                                                fileService.rename(
+                                                                id,
+                                                                request,
+                                                                authentication))
+                                .build();
+        }
+
+        @GetMapping("/folder/{folderId}")
+        public ApiResponse<List<FileResponse>> getFilesInFolder(
+
+                        @PathVariable UUID folderId,
+
+                        Authentication authentication
+
+        ) {
+
+                return ApiResponse.<List<FileResponse>>builder()
+                                .success(true)
+                                .message("Files fetched successfully")
+                                .data(
+                                                fileService.getFilesInFolder(
+                                                                folderId,
+                                                                authentication))
+                                .build();
+        }
 }

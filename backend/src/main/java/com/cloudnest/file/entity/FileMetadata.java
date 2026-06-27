@@ -5,6 +5,7 @@ import com.cloudnest.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import com.cloudnest.folder.entity.Folder;
 
 @Entity
 @Table(name = "files")
@@ -33,4 +34,9 @@ public class FileMetadata extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "folder_id")
+    private Folder folder;
+
 }
