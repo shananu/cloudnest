@@ -1,6 +1,5 @@
 package com.cloudnest.folder.repository;
 
-import com.cloudnest.file.entity.FileMetadata;
 import com.cloudnest.folder.entity.Folder;
 import com.cloudnest.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
