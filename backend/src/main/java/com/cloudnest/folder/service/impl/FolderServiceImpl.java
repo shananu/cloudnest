@@ -13,7 +13,6 @@ import com.cloudnest.folder.repository.FolderRepository;
 import com.cloudnest.folder.service.FolderService;
 import com.cloudnest.storage.service.StorageService;
 import com.cloudnest.user.entity.User;
-import com.cloudnest.user.repository.UserRepository;
 import com.cloudnest.user.service.CurrentUserService;
 
 import lombok.RequiredArgsConstructor;
