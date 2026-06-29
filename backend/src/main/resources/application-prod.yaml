@@ -17,3 +17,6 @@ minio:
   access-key: admin
   secret-key: password123
   bucket: cloudnest
+
+app:
+  base-url: http://localhost:8080
