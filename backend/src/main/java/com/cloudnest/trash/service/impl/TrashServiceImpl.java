@@ -9,14 +9,18 @@ import com.cloudnest.folder.dto.response.FolderResponse;
 import com.cloudnest.folder.entity.Folder;
 import com.cloudnest.folder.mapper.FolderMapper;
 import com.cloudnest.folder.repository.FolderRepository;
+import com.cloudnest.storage.service.StorageService;
 import com.cloudnest.trash.dto.TrashResponse;
 import com.cloudnest.trash.service.TrashService;
 import com.cloudnest.user.entity.User;
 import com.cloudnest.user.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TrashServiceImpl implements TrashService {
 
+    private final StorageService storageService;
     private final FileRepository fileRepository;
     private final FolderRepository folderRepository;
 
@@ -118,5 +123,56 @@ public class TrashServiceImpl implements TrashService {
             }
         }
 
+    }
+
+    @Override
+    public void permanentlyDeleteFile(
+            UUID fileId,
+            Authentication authentication) throws IOException {
+
+        User owner = currentUserService.getCurrentUser(authentication);
+
+        FileMetadata file = fileRepository
+                .findByIdAndOwnerAndDeletedAtIsNotNull(fileId, owner)
+                .orElseThrow(() -> new ResourceNotFoundException("File"));
+
+        storageService.delete(file.getStorageKey());
+
+        fileRepository.delete(file);
+    }
+
+    @Override
+    public void permanentlyDeleteFolder(
+            UUID folderId,
+            Authentication authentication) throws IOException {
+
+        User owner = currentUserService.getCurrentUser(authentication);
+
+        Folder folder = folderRepository
+                .findByIdAndOwnerAndDeletedAtIsNotNull(folderId, owner)
+                .orElseThrow(() -> new ResourceNotFoundException("Folder"));
+
+        permanentlyDeleteFolderRecursive(folder);
+    }
+
+    private void permanentlyDeleteFolderRecursive(
+            Folder folder) throws IOException {
+
+        List<Folder> children = folderRepository.findByParent(folder);
+
+        for (Folder child : children) {
+            permanentlyDeleteFolderRecursive(child);
+        }
+
+        List<FileMetadata> files = fileRepository.findByFolder(folder);
+
+        for (FileMetadata file : files) {
+
+            storageService.delete(file.getStorageKey());
+
+            fileRepository.delete(file);
+        }
+
+        folderRepository.delete(folder);
     }
 }

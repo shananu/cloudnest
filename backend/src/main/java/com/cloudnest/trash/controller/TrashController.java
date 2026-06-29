@@ -5,6 +5,7 @@ import com.cloudnest.trash.dto.TrashResponse;
 import com.cloudnest.trash.service.TrashService;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
@@ -59,6 +60,32 @@ public class TrashController {
         return ApiResponse.<Void>builder()
                 .success(true)
                 .message("Folder restored successfully")
+                .build();
+    }
+
+    @DeleteMapping("/files/{id}")
+    public ApiResponse<Void> permanentlyDeleteFile(
+            @PathVariable UUID id,
+            Authentication authentication) throws IOException {
+
+        trashService.permanentlyDeleteFile(id, authentication);
+
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("File permanently deleted")
+                .build();
+    }
+
+    @DeleteMapping("/folders/{id}")
+    public ApiResponse<Void> permanentlyDeleteFolder(
+            @PathVariable UUID id,
+            Authentication authentication) throws IOException {
+
+        trashService.permanentlyDeleteFolder(id, authentication);
+
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("Folder permanently deleted")
                 .build();
     }
 }
