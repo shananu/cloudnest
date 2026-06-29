@@ -16,6 +16,12 @@ public interface FileRepository extends JpaRepository<FileMetadata, UUID> {
     List<FileMetadata> findByFolderAndDeletedAtIsNull(Folder folder);
     List<FileMetadata> findByFolderAndOwnerAndDeletedAtIsNull(Folder folder, User owner);
     Optional<FileMetadata> findByIdAndOwnerAndDeletedAtIsNull(UUID id, User owner);
+
+    // Deleted files (Trash)
+    List<FileMetadata> findByFolderAndDeletedAtIsNotNull(Folder folder);
     List<FileMetadata> findByOwnerAndDeletedAtIsNotNull(User owner);
+    Optional<FileMetadata> findByIdAndOwnerAndDeletedAtIsNotNull(UUID id, User owner);
+
+    List<FileMetadata> findByFolder(Folder folder);
 
 }
