@@ -11,7 +11,6 @@ import com.cloudnest.folder.entity.Folder;
 import com.cloudnest.folder.mapper.FolderMapper;
 import com.cloudnest.folder.repository.FolderRepository;
 import com.cloudnest.folder.service.FolderService;
-import com.cloudnest.storage.service.StorageService;
 import com.cloudnest.user.entity.User;
 import com.cloudnest.user.service.CurrentUserService;
 
@@ -19,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -28,9 +27,8 @@ public class FolderServiceImpl implements FolderService {
 
     private final FolderRepository folderRepository;
     private final FolderMapper folderMapper;
-    private final CurrentUserService currentUserService;        
+    private final CurrentUserService currentUserService;
     private final FileRepository fileRepository;
-    private final StorageService storageService;
 
     @Override
     public FolderResponse create(
@@ -42,7 +40,7 @@ public class FolderServiceImpl implements FolderService {
         Folder parent = null;
 
         if (request.getParentId() != null) {
-            parent = folderRepository.findByIdAndOwner(request.getParentId(), owner)
+            parent = folderRepository.findByIdAndOwnerAndDeletedAtIsNull(request.getParentId(), owner)
                     .orElseThrow(() -> new ResourceNotFoundException("Folder"));
         }
 
@@ -63,7 +61,7 @@ public class FolderServiceImpl implements FolderService {
 
         User owner = currentUserService.getCurrentUser(authentication);
 
-        return folderRepository.findByOwner(owner)
+        return folderRepository.findByOwnerAndDeletedAtIsNull(owner)
                 .stream()
                 .map(folderMapper::toResponse)
                 .toList();
@@ -75,7 +73,7 @@ public class FolderServiceImpl implements FolderService {
 
         User owner = currentUserService.getCurrentUser(authentication);
 
-        List<Folder> folders = folderRepository.findByOwner(owner);
+        List<Folder> folders = folderRepository.findByOwnerAndDeletedAtIsNull(owner);
 
         Map<UUID, FolderTreeResponse> folderMap = new HashMap<>();
 
@@ -127,7 +125,7 @@ public class FolderServiceImpl implements FolderService {
 
         User owner = currentUserService.getCurrentUser(authentication);
 
-        Folder folder = folderRepository.findByIdAndOwner(
+        Folder folder = folderRepository.findByIdAndOwnerAndDeletedAtIsNull(
                 folderId,
                 owner)
                 .orElseThrow(() -> new ResourceNotFoundException("Folder"));
@@ -142,40 +140,37 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public void delete(
             UUID folderId,
-            Authentication authentication) throws IOException {
+            Authentication authentication) {
 
         User owner = currentUserService.getCurrentUser(authentication);
 
-        Folder folder = folderRepository.findByIdAndOwner(
-                folderId,
-                owner)
+        Folder folder = folderRepository
+                .findByIdAndOwnerAndDeletedAtIsNull(folderId, owner)
                 .orElseThrow(() -> new ResourceNotFoundException("Folder"));
 
-        deleteFolderRecursive(folder);
+        Instant now = Instant.now();
+
+        deleteFolderRecursive(folder, now);
     }
 
     private void deleteFolderRecursive(
-            Folder folder) throws IOException {
+            Folder folder,
+            Instant deletedAt) {
 
-        // Delete child folders first
-        List<Folder> children = folderRepository.findByParent(folder);
+        List<Folder> children = folderRepository.findByParentAndDeletedAtIsNull(folder);
 
         for (Folder child : children) {
-            deleteFolderRecursive(child);
+            deleteFolderRecursive(child, deletedAt);
         }
 
-        // Delete files inside this folder
-        List<FileMetadata> files = fileRepository.findByFolder(folder);
+        List<FileMetadata> files = fileRepository.findByFolderAndDeletedAtIsNull(folder);
 
         for (FileMetadata file : files) {
-
-            storageService.delete(
-                    file.getStorageKey());
-
-            fileRepository.delete(file);
+            file.setDeletedAt(deletedAt);
+            fileRepository.save(file);
         }
 
-        // Finally delete current folder
-        folderRepository.delete(folder);
+        folder.setDeletedAt(deletedAt);
+        folderRepository.save(folder);
     }
 }

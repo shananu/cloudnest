@@ -52,7 +52,7 @@ public class ShareServiceImpl implements ShareService {
                 User owner = currentUserService.getCurrentUser(authentication);
 
                 FileMetadata file = fileRepository
-                                .findByIdAndOwner(fileId, owner)
+                                .findByIdAndOwnerAndDeletedAtIsNull(fileId, owner)
                                 .orElseThrow(() -> new ResourceNotFoundException("File not found"));
 
                 ShareLink share = ShareLink.builder()
@@ -89,7 +89,7 @@ public class ShareServiceImpl implements ShareService {
                 User owner = currentUserService.getCurrentUser(authentication);
 
                 FileMetadata file = fileRepository
-                                .findByIdAndOwner(fileId, owner)
+                                .findByIdAndOwnerAndDeletedAtIsNull(fileId, owner)
                                 .orElseThrow(() -> new ResourceNotFoundException("File not found"));
 
                 return shareRepository.findByFile(file)

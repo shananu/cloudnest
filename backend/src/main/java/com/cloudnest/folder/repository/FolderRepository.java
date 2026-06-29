@@ -10,7 +10,12 @@ import java.util.UUID;
 
 public interface FolderRepository extends JpaRepository<Folder, UUID> {
 
-    List<Folder> findByOwner(User owner);
-    Optional<Folder> findByIdAndOwner(UUID id, User owner);
-    List<Folder> findByParent(Folder parent);
+    // Active folders
+    List<Folder> findByOwnerAndDeletedAtIsNull(User owner);
+    Optional<Folder> findByIdAndOwnerAndDeletedAtIsNull(UUID id, User owner);
+    List<Folder> findByParentAndDeletedAtIsNull(Folder parent);
+
+    // Deleted folders (Trash)
+    List<Folder> findByOwnerAndDeletedAtIsNotNull(User owner);
+    List<Folder> findByParentAndDeletedAtIsNotNull(Folder parent);
 }

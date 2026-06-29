@@ -12,16 +12,10 @@ import java.util.UUID;
 
 public interface FileRepository extends JpaRepository<FileMetadata, UUID> {
 
-    List<FileMetadata> findByOwner(User owner);
-
-    List<FileMetadata> findByFolder(Folder folder);
-
-    List<FileMetadata> findByFolderAndOwner(
-            Folder folder,
-            User owner);
-
-    Optional<FileMetadata> findByIdAndOwner(
-            UUID id,
-            User owner);
+    List<FileMetadata> findByOwnerAndDeletedAtIsNull(User owner);
+    List<FileMetadata> findByFolderAndDeletedAtIsNull(Folder folder);
+    List<FileMetadata> findByFolderAndOwnerAndDeletedAtIsNull(Folder folder, User owner);
+    Optional<FileMetadata> findByIdAndOwnerAndDeletedAtIsNull(UUID id, User owner);
+    List<FileMetadata> findByOwnerAndDeletedAtIsNotNull(User owner);
 
 }

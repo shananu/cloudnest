@@ -25,6 +25,7 @@ import org.springframework.core.io.Resource;
 import java.util.UUID;
 import java.util.List;
 import java.io.IOException;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class FileServiceImpl implements FileService {
 
                 if (folderId != null) {
 
-                        folder = folderRepository.findByIdAndOwner(
+                        folder = folderRepository.findByIdAndOwnerAndDeletedAtIsNull(
                                         folderId,
                                         owner)
                                         .orElseThrow(() -> new ResourceNotFoundException("Folder"));
@@ -76,7 +77,7 @@ public class FileServiceImpl implements FileService {
 
                 User owner = currentUserService.getCurrentUser(authentication);
 
-                return fileRepository.findByOwner(owner)
+                return fileRepository.findByOwnerAndDeletedAtIsNull(owner)
                                 .stream()
                                 .map(fileMapper::toResponse)
                                 .toList();
@@ -113,16 +114,18 @@ public class FileServiceImpl implements FileService {
 
         @Override
         public void delete(
-                        UUID fileId,
-                        Authentication authentication) throws IOException {
+                        UUID id,
+                        Authentication authentication) {
 
-                User owner = currentUserService.getCurrentUser(authentication   );
+                User owner = currentUserService.getCurrentUser(authentication);
 
-                FileMetadata metadata = getOwnedFile(fileId, owner);
+                FileMetadata file = fileRepository
+                                .findByIdAndOwnerAndDeletedAtIsNull(id, owner)
+                                .orElseThrow(() -> new ResourceNotFoundException("File"));
 
-                storageService.delete(metadata.getStoredFilename());
+                file.setDeletedAt(Instant.now());
 
-                fileRepository.delete(metadata);
+                fileRepository.save(file);
         }
 
         @Override
@@ -147,12 +150,12 @@ public class FileServiceImpl implements FileService {
 
                 User owner = currentUserService.getCurrentUser(authentication);
 
-                Folder folder = folderRepository.findByIdAndOwner(
+                Folder folder = folderRepository.findByIdAndOwnerAndDeletedAtIsNull     (
                                 folderId,
                                 owner)
                                 .orElseThrow(() -> new ResourceNotFoundException("Folder"));
 
-                return fileRepository.findByFolderAndOwner(
+                return fileRepository.findByFolderAndOwnerAndDeletedAtIsNull(
                                 folder,
                                 owner)
                                 .stream()
