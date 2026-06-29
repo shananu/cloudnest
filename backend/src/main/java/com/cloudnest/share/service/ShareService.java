@@ -2,8 +2,13 @@ package com.cloudnest.share.service;
 
 import com.cloudnest.share.dto.request.CreateShareRequest;
 import com.cloudnest.share.dto.response.ShareResponse;
-import org.springframework.security.core.Authentication;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,5 +29,7 @@ public interface ShareService {
             UUID shareId,
             Authentication authentication
     );
+
+    ResponseEntity<Resource> downloadSharedFile(String token) throws IOException;
 
 }

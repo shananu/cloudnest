@@ -2,6 +2,8 @@ package com.cloudnest.share.repository;
 
 import com.cloudnest.file.entity.FileMetadata;
 import com.cloudnest.share.entity.ShareLink;
+import com.cloudnest.user.entity.User;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,5 +16,9 @@ public interface ShareRepository
     Optional<ShareLink> findByToken(String token);
 
     List<ShareLink> findByFile(FileMetadata file);
+
+    Optional<ShareLink> findByIdAndOwner(
+            UUID id,
+            User owner);
 
 }
