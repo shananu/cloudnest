@@ -15,6 +15,8 @@ import com.cloudnest.storage.model.StoredFile;
 import com.cloudnest.storage.service.StorageService;
 import com.cloudnest.user.entity.User;
 import com.cloudnest.user.repository.UserRepository;
+import com.cloudnest.user.service.CurrentUserService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class FileServiceImpl implements FileService {
         private final StorageService storageService;
         private final FileRepository fileRepository;
         private final FileMapper fileMapper;
-        private final UserRepository userRepository;
+        private final CurrentUserService currentUserService;
         private final FolderRepository folderRepository;
 
         @Override
@@ -41,8 +43,7 @@ public class FileServiceImpl implements FileService {
                         UUID folderId,
                         Authentication authentication) throws IOException {
 
-                User owner = userRepository.findByEmail(authentication.getName())
-                                .orElseThrow(() -> new ResourceNotFoundException("User"));
+                User owner = currentUserService.getCurrentUser(authentication);
 
                 Folder folder = null;
 
@@ -74,8 +75,7 @@ public class FileServiceImpl implements FileService {
         @Override
         public List<FileResponse> getMyFiles(Authentication authentication) {
 
-                User owner = userRepository.findByEmail(authentication.getName())
-                                .orElseThrow(() -> new ResourceNotFoundException("User"));
+                User owner = currentUserService.getCurrentUser(authentication);
 
                 return fileRepository.findByOwner(owner)
                                 .stream()
@@ -88,8 +88,7 @@ public class FileServiceImpl implements FileService {
                         UUID fileId,
                         Authentication authentication) throws IOException {
 
-                User owner = userRepository.findByEmail(authentication.getName())
-                                .orElseThrow(() -> new ResourceNotFoundException("User"));
+                User owner = currentUserService.getCurrentUser(authentication);
 
                 FileMetadata metadata = getOwnedFile(fileId, owner);
 
@@ -104,7 +103,7 @@ public class FileServiceImpl implements FileService {
         private FileMetadata getOwnedFile(UUID fileId, User owner) {
 
                 FileMetadata metadata = fileRepository.findById(fileId)
-                                .orElseThrow(() -> new ResourceNotFoundException("User"));
+                                .orElseThrow(() -> new ResourceNotFoundException("File"));
 
                 if (!metadata.getOwner().getId().equals(owner.getId())) {
                         throw new AccessDeniedException();
@@ -118,8 +117,7 @@ public class FileServiceImpl implements FileService {
                         UUID fileId,
                         Authentication authentication) throws IOException {
 
-                User owner = userRepository.findByEmail(authentication.getName())
-                                .orElseThrow(() -> new ResourceNotFoundException("User"));
+                User owner = currentUserService.getCurrentUser(authentication   );
 
                 FileMetadata metadata = getOwnedFile(fileId, owner);
 
@@ -134,8 +132,7 @@ public class FileServiceImpl implements FileService {
                         RenameFileRequest request,
                         Authentication authentication) {
 
-                User owner = userRepository.findByEmail(authentication.getName())
-                                .orElseThrow(() -> new ResourceNotFoundException("User"));
+                User owner = currentUserService.getCurrentUser(authentication);
 
                 FileMetadata metadata = getOwnedFile(fileId, owner);
                 metadata.setOriginalFilename(request.getFilename());
@@ -149,8 +146,7 @@ public class FileServiceImpl implements FileService {
                         UUID folderId,
                         Authentication authentication) {
 
-                User owner = userRepository.findByEmail(authentication.getName())
-                                .orElseThrow(() -> new ResourceNotFoundException("User"));
+                User owner = currentUserService.getCurrentUser(authentication);
 
                 Folder folder = folderRepository.findByIdAndOwner(
                                 folderId,

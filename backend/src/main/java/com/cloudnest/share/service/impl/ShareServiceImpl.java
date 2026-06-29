@@ -10,6 +10,7 @@ import com.cloudnest.share.repository.ShareRepository;
 import com.cloudnest.share.service.ShareService;
 import com.cloudnest.user.entity.User;
 import com.cloudnest.user.repository.UserRepository;
+import com.cloudnest.user.service.CurrentUserService;
 import com.cloudnest.common.exception.ResourceNotFoundException;
 import com.cloudnest.config.AppProperties;
 
@@ -28,7 +29,7 @@ public class ShareServiceImpl implements ShareService {
 
     private final ShareRepository shareRepository;
     private final FileRepository fileRepository;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
     private final ShareMapper shareMapper;
     private final AppProperties appProperties;
 
@@ -38,8 +39,7 @@ public class ShareServiceImpl implements ShareService {
             CreateShareRequest request,
             Authentication authentication) {
 
-        User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("User"));
+        User owner = currentUserService.getCurrentUser(authentication);
 
         FileMetadata file = fileRepository
                 .findByIdAndOwner(fileId, owner)

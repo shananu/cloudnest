@@ -14,6 +14,8 @@ import com.cloudnest.folder.service.FolderService;
 import com.cloudnest.storage.service.StorageService;
 import com.cloudnest.user.entity.User;
 import com.cloudnest.user.repository.UserRepository;
+import com.cloudnest.user.service.CurrentUserService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ public class FolderServiceImpl implements FolderService {
 
     private final FolderRepository folderRepository;
     private final FolderMapper folderMapper;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;        
     private final FileRepository fileRepository;
     private final StorageService storageService;
 
@@ -36,8 +38,7 @@ public class FolderServiceImpl implements FolderService {
             CreateFolderRequest request,
             Authentication authentication) {
 
-        User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("User"));
+        User owner = currentUserService.getCurrentUser(authentication);
 
         Folder parent = null;
 
@@ -61,8 +62,7 @@ public class FolderServiceImpl implements FolderService {
     public List<FolderResponse> getMyFolders(
             Authentication authentication) {
 
-        User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("User"));
+        User owner = currentUserService.getCurrentUser(authentication);
 
         return folderRepository.findByOwner(owner)
                 .stream()
@@ -74,8 +74,7 @@ public class FolderServiceImpl implements FolderService {
     public List<FolderTreeResponse> getFolderTree(
             Authentication authentication) {
 
-        User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("User"));
+        User owner = currentUserService.getCurrentUser(authentication);
 
         List<Folder> folders = folderRepository.findByOwner(owner);
 
@@ -127,8 +126,7 @@ public class FolderServiceImpl implements FolderService {
             RenameFolderRequest request,
             Authentication authentication) {
 
-        User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("User"));
+        User owner = currentUserService.getCurrentUser(authentication);
 
         Folder folder = folderRepository.findByIdAndOwner(
                 folderId,
@@ -147,8 +145,7 @@ public class FolderServiceImpl implements FolderService {
             UUID folderId,
             Authentication authentication) throws IOException {
 
-        User owner = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("User"));
+        User owner = currentUserService.getCurrentUser(authentication);
 
         Folder folder = folderRepository.findByIdAndOwner(
                 folderId,
