@@ -6,6 +6,7 @@ import com.cloudnest.user.entity.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,5 +24,6 @@ public interface FileRepository extends JpaRepository<FileMetadata, UUID> {
     Optional<FileMetadata> findByIdAndOwnerAndDeletedAtIsNotNull(UUID id, User owner);
 
     List<FileMetadata> findByFolder(Folder folder);
+    List<FileMetadata> findByDeletedAtBefore(Instant instant);
 
 }

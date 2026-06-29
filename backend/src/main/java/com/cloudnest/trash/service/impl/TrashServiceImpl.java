@@ -16,7 +16,6 @@ import com.cloudnest.user.entity.User;
 import com.cloudnest.user.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 

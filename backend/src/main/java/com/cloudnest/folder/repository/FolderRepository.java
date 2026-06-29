@@ -4,6 +4,7 @@ import com.cloudnest.folder.entity.Folder;
 import com.cloudnest.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,4 +22,5 @@ public interface FolderRepository extends JpaRepository<Folder, UUID> {
     Optional<Folder> findByIdAndOwnerAndDeletedAtIsNotNull(UUID id, User owner);
 
     List<Folder> findByParent(Folder parent);
+    List<Folder> findByDeletedAtBefore(Instant instant);
 }
