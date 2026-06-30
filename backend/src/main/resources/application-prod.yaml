@@ -11,6 +11,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  
+
 
 minio:
   endpoint: http://localhost:9000

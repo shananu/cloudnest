@@ -33,6 +33,15 @@ services:
     volumes:
       - minio_data:/data
 
+  redis:
+    image: redis:7
+    container_name: cloudnest-redis
+
+    ports:
+      - "6379:6379"
+
+    restart: unless-stopped
+
 volumes:
 
   postgres_data:
