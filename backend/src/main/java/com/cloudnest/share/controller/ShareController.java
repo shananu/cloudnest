@@ -4,6 +4,8 @@ import com.cloudnest.common.response.ApiResponse;
 import com.cloudnest.share.dto.request.CreateShareRequest;
 import com.cloudnest.share.dto.response.ShareResponse;
 import com.cloudnest.share.service.ShareService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -15,6 +17,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(
+    name = "Sharing",
+    description = "Public file sharing APIs"
+)
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor

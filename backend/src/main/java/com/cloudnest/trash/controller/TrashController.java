@@ -3,6 +3,8 @@ package com.cloudnest.trash.controller;
 import com.cloudnest.common.response.ApiResponse;
 import com.cloudnest.trash.dto.TrashResponse;
 import com.cloudnest.trash.service.TrashService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -11,6 +13,10 @@ import java.util.UUID;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(
+    name = "Trash",
+    description = "Recycle bin APIs"
+)
 @RestController
 @RequestMapping("/api/v1/trash")
 @RequiredArgsConstructor

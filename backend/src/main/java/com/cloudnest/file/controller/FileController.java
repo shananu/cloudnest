@@ -6,6 +6,7 @@ import com.cloudnest.file.dto.response.DownloadFileResponse;
 import com.cloudnest.file.dto.response.FileResponse;
 import com.cloudnest.file.service.FileService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,10 @@ import java.util.UUID;
 import java.util.List;
 import java.io.IOException;
 
+@Tag(
+    name = "Files",
+    description = "File management APIs"
+)
 @RestController
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor

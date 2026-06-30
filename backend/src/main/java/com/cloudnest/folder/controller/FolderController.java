@@ -6,6 +6,8 @@ import com.cloudnest.folder.dto.request.RenameFolderRequest;
 import com.cloudnest.folder.dto.response.FolderResponse;
 import com.cloudnest.folder.dto.response.FolderTreeResponse;
 import com.cloudnest.folder.service.FolderService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -15,6 +17,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(
+    name = "Folders",
+    description = "Folder management APIs"
+)
 @RestController
 @RequestMapping("/api/v1/folders")
 @RequiredArgsConstructor

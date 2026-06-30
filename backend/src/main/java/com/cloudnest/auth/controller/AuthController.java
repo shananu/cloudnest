@@ -5,10 +5,16 @@ import com.cloudnest.auth.dto.request.RegisterRequest;
 import com.cloudnest.auth.dto.response.AuthResponse;
 import com.cloudnest.auth.service.AuthService;
 import com.cloudnest.common.response.ApiResponse;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(
+    name = "Authentication",
+    description = "Authentication and user management APIs"
+)
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
