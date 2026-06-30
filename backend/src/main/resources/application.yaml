@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: prod
+
+server:
+  port: 8080
+
+jwt:
+  secret: Y2xvdWRuZXN0LXN1cGVyLXNlY3JldC1rZXktZm9yLWp3dC0yMDI2LWFwcA==
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
