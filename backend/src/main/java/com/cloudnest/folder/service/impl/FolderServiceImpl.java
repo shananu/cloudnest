@@ -1,5 +1,6 @@
 package com.cloudnest.folder.service.impl;
 
+import com.cloudnest.common.cache.CacheNames;
 import com.cloudnest.common.exception.ResourceNotFoundException;
 import com.cloudnest.file.entity.FileMetadata;
 import com.cloudnest.file.repository.FileRepository;
@@ -17,6 +18,8 @@ import com.cloudnest.user.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.Instant;
 import java.util.*;
@@ -30,6 +33,7 @@ public class FolderServiceImpl implements FolderService {
     private final CurrentUserService currentUserService;
     private final FileRepository fileRepository;
 
+    @CacheEvict(value = CacheNames.FOLDERS, key = "#authentication.name")
     @Override
     public FolderResponse create(
             CreateFolderRequest request,
@@ -67,6 +71,7 @@ public class FolderServiceImpl implements FolderService {
                 .toList();
     }
 
+    @Cacheable(value = CacheNames.FOLDERS, key = "#authentication.name")
     @Override
     public List<FolderTreeResponse> getFolderTree(
             Authentication authentication) {
@@ -117,6 +122,7 @@ public class FolderServiceImpl implements FolderService {
                 .build();
     }
 
+    @CacheEvict(value = CacheNames.FOLDERS, key = "#authentication.name")
     @Override
     public FolderResponse rename(
             UUID folderId,
@@ -137,6 +143,7 @@ public class FolderServiceImpl implements FolderService {
         return folderMapper.toResponse(folder);
     }
 
+    @CacheEvict(value = CacheNames.FOLDERS, key = "#authentication.name")
     @Override
     public void delete(
             UUID folderId,

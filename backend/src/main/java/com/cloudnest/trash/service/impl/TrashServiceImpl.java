@@ -1,5 +1,6 @@
 package com.cloudnest.trash.service.impl;
 
+import com.cloudnest.common.cache.CacheNames;
 import com.cloudnest.common.exception.ResourceNotFoundException;
 import com.cloudnest.file.dto.response.FileResponse;
 import com.cloudnest.file.entity.FileMetadata;
@@ -16,6 +17,7 @@ import com.cloudnest.user.entity.User;
 import com.cloudnest.user.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +79,7 @@ public class TrashServiceImpl implements TrashService {
         fileRepository.save(file);
     }
 
+    @CacheEvict(value = CacheNames.FOLDERS, key = "#authentication.name")
     @Override
     public void restoreFolder(
             UUID folderId,

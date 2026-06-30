@@ -1,15 +1,20 @@
 package com.cloudnest.folder.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
+@Setter
 @Builder
-public class FolderTreeResponse {
+@NoArgsConstructor
+@AllArgsConstructor
+public class FolderTreeResponse implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private UUID id;
 
