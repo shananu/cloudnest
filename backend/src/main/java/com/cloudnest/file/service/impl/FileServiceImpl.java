@@ -15,12 +15,16 @@ import com.cloudnest.storage.model.StoredFile;
 import com.cloudnest.storage.service.StorageService;
 import com.cloudnest.user.entity.User;
 import com.cloudnest.user.service.CurrentUserService;
+import com.cloudnest.common.cache.CacheNames;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.util.UUID;
 import java.util.List;
@@ -37,14 +41,16 @@ public class FileServiceImpl implements FileService {
         private final CurrentUserService currentUserService;
         private final FolderRepository folderRepository;
 
+        @Caching(evict = {
+                        @CacheEvict(cacheNames = CacheNames.FILES, key = "#authentication.name"),
+                        @CacheEvict(cacheNames = CacheNames.FOLDERS, key = "#authentication.name")
+
+        })
         @Override
-        public FileResponse upload(
-                        MultipartFile file,
-                        UUID folderId,
-                        Authentication authentication) throws IOException {
+        public FileResponse upload(MultipartFile file, UUID folderId, Authentication authentication)
+                        throws IOException {
 
                 User owner = currentUserService.getCurrentUser(authentication);
-
                 Folder folder = null;
 
                 if (folderId != null) {
@@ -72,6 +78,7 @@ public class FileServiceImpl implements FileService {
                 return fileMapper.toResponse(metadata);
         }
 
+        @Cacheable(cacheNames = CacheNames.FILES, key = "#authentication.name")
         @Override
         public List<FileResponse> getMyFiles(Authentication authentication) {
 
@@ -112,6 +119,11 @@ public class FileServiceImpl implements FileService {
                 return metadata;
         }
 
+        @Caching(evict = {
+                        @CacheEvict(cacheNames = CacheNames.FILES, key = "#authentication.name"),
+                        @CacheEvict(cacheNames = CacheNames.FOLDERS, key = "#authentication.name")
+
+        })
         @Override
         public void delete(
                         UUID id,
@@ -128,6 +140,9 @@ public class FileServiceImpl implements FileService {
                 fileRepository.save(file);
         }
 
+        @Caching(evict = {
+                @CacheEvict(cacheNames = CacheNames.FILES, key = "#authentication.name")
+        })
         @Override
         public FileResponse rename(
                         UUID fileId,
@@ -150,7 +165,7 @@ public class FileServiceImpl implements FileService {
 
                 User owner = currentUserService.getCurrentUser(authentication);
 
-                Folder folder = folderRepository.findByIdAndOwnerAndDeletedAtIsNull     (
+                Folder folder = folderRepository.findByIdAndOwnerAndDeletedAtIsNull(
                                 folderId,
                                 owner)
                                 .orElseThrow(() -> new ResourceNotFoundException("Folder"));

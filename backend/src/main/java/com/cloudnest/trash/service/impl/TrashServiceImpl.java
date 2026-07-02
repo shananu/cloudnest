@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,6 +40,7 @@ public class TrashServiceImpl implements TrashService {
 
     private final CurrentUserService currentUserService;
 
+    @Cacheable(cacheNames = CacheNames.TRASH, key = "#authentication.name")
     @Override
     public TrashResponse getTrash(Authentication authentication) {
 
@@ -61,6 +64,13 @@ public class TrashServiceImpl implements TrashService {
                 .build();
     }
 
+    @Caching(evict = {
+
+            @CacheEvict(cacheNames = CacheNames.TRASH, key = "#authentication.name"),
+
+            @CacheEvict(cacheNames = CacheNames.FILES, key = "#authentication.name")
+
+    })
     @Override
     public void restoreFile(
             UUID fileId,
@@ -79,7 +89,13 @@ public class TrashServiceImpl implements TrashService {
         fileRepository.save(file);
     }
 
-    @CacheEvict(value = CacheNames.FOLDERS, key = "#authentication.name")
+    @Caching(evict = {
+
+            @CacheEvict(cacheNames = CacheNames.TRASH, key = "#authentication.name"),
+            @CacheEvict(cacheNames = CacheNames.FILES, key = "#authentication.name"),
+            @CacheEvict(cacheNames = CacheNames.FOLDERS, key = "#authentication.name")
+
+    })
     @Override
     public void restoreFolder(
             UUID folderId,
@@ -127,6 +143,12 @@ public class TrashServiceImpl implements TrashService {
 
     }
 
+    @Caching(evict = {
+
+            @CacheEvict(cacheNames = CacheNames.TRASH, key = "#authentication.name"),
+            @CacheEvict(cacheNames = CacheNames.FILES, key = "#authentication.name")
+
+    })
     @Override
     public void permanentlyDeleteFile(
             UUID fileId,
@@ -143,6 +165,13 @@ public class TrashServiceImpl implements TrashService {
         fileRepository.delete(file);
     }
 
+    @Caching(evict = {
+
+            @CacheEvict(cacheNames = CacheNames.TRASH, key = "#authentication.name"),
+            @CacheEvict(cacheNames = CacheNames.FILES, key = "#authentication.name"),
+            @CacheEvict(cacheNames = CacheNames.FOLDERS, key = "#authentication.name")
+
+    })
     @Override
     public void permanentlyDeleteFolder(
             UUID folderId,
